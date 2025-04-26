@@ -97,22 +97,27 @@ nav {
     max-width: 1200px;
     margin: 0 auto;
     position: relative;
-}
-
-.gallery-slider {
-    display: flex;
-    overflow: hidden;
-    height: 500px;
     background-color: #000;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.gallery-slider {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
 }
 
 .gallery-slider iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     border: none;
-    object-fit: cover;
+    background-color: #000;
 }
 
 .gallery-controls {
@@ -131,11 +136,12 @@ nav {
     padding: 0.5rem 1rem;
     cursor: pointer;
     border-radius: 5px;
-    transition: background 0.3s;
+    transition: all 0.3s ease;
 }
 
 .gallery-controls button:hover {
     background: rgba(255, 255, 255, 1);
+    transform: scale(1.1);
 }
 
 /* About Section */

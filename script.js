@@ -27,16 +27,17 @@ function initializeGallery() {
     try {
         console.log('Initializing gallery...');
         
-        // Create media items directly
+        // Create media items with embed URLs
         const photos = config.photoIds.map(id => ({
             type: 'image',
-            url: `https://lh3.googleusercontent.com/d/${id}=s1000`, // Direct image URL
+            url: `https://drive.google.com/uc?export=view&id=${id}`,
+            embedUrl: `https://drive.google.com/file/d/${id}/preview`,
             id: id
         }));
         
         const videos = config.videoIds.map(id => ({
             type: 'video',
-            url: `https://drive.google.com/file/d/${id}/preview`, // Preview URL for videos
+            url: `https://drive.google.com/file/d/${id}/preview`,
             id: id
         }));
         
@@ -72,13 +73,15 @@ function displayCurrentItem() {
     let mediaElement;
     
     if (currentItem.type === 'image') {
-        // For images, use a direct img element
-        mediaElement = document.createElement('img');
-        mediaElement.src = currentItem.url;
-        mediaElement.alt = `Photo ${currentItem.id}`;
+        // For images, use an iframe with the preview URL
+        mediaElement = document.createElement('iframe');
+        mediaElement.src = currentItem.embedUrl;
+        mediaElement.frameBorder = '0';
+        mediaElement.allowFullscreen = true;
         mediaElement.style.width = '100%';
         mediaElement.style.height = '100%';
-        mediaElement.style.objectFit = 'cover';
+        mediaElement.style.border = 'none';
+        mediaElement.style.background = '#000';
     } else {
         // For videos, use an iframe with the preview URL
         mediaElement = document.createElement('iframe');
@@ -87,6 +90,8 @@ function displayCurrentItem() {
         mediaElement.allowFullscreen = true;
         mediaElement.style.width = '100%';
         mediaElement.style.height = '100%';
+        mediaElement.style.border = 'none';
+        mediaElement.style.background = '#000';
     }
     
     gallerySlider.innerHTML = '';
