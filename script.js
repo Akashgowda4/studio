@@ -2,13 +2,11 @@
 const config = {
     // Add your photo file IDs here (just the ID part from the Google Drive share link)
     photoIds: [
-        '1Qa5FeueDj9dULfL6d_xryLYPpsEDbgoR', // Replace with your actual photo file IDs
-        // Add more photo IDs as needed
+        '1SNVZ2w5J2SEZw7kjTWaNgBCyHIKkkNhF', // This is your working photo file ID
     ],
     // Add your video file IDs here
     videoIds: [
-        '1QbwQj25Xn58iND952gwinBDRihU5peej', // Replace with your actual video file IDs
-        // Add more video IDs as needed
+        // Add video file IDs here if you have any
     ],
     slideInterval: 5000, // Time between slides in milliseconds
 };
