@@ -30,8 +30,8 @@ async function initializeGallery() {
         const photos = await loadMediaItems(config.photoIds, 'image');
         const videos = await loadMediaItems(config.videoIds, 'video');
         
-        console.log('Loaded photos:', photos.length);
-        console.log('Loaded videos:', videos.length);
+        console.log('Loaded photos:', photos);
+        console.log('Loaded videos:', videos);
         
         // Combine and shuffle the media items
         mediaItems = [...photos, ...videos].sort(() => Math.random() - 0.5);
@@ -55,26 +55,51 @@ async function initializeGallery() {
 // Load media items from Google Drive
 async function loadMediaItems(fileIds, type) {
     const items = [];
-    const baseUrl = 'https://drive.google.com/uc?export=view&id=';
+    const baseUrls = [
+        'https://drive.google.com/uc?export=view&id=',
+        'https://drive.google.com/file/d/',
+        'https://docs.google.com/uc?id='
+    ];
     
     try {
         for (const fileId of fileIds) {
-            const testUrl = `${baseUrl}${fileId}`;
-            console.log(`Testing ${type} URL:`, testUrl);
-            
-            try {
-                const response = await fetch(testUrl, { method: 'HEAD' });
-                if (response.ok) {
-                    console.log(`Found valid ${type} at:`, testUrl);
-                    const item = {
-                        type,
-                        url: testUrl,
-                        id: fileId
-                    };
-                    items.push(item);
+            for (const baseUrl of baseUrls) {
+                const testUrl = `${baseUrl}${fileId}`;
+                console.log(`Testing ${type} URL:`, testUrl);
+                
+                try {
+                    // For images, we can use a simple fetch
+                    if (type === 'image') {
+                        const img = new Image();
+                        await new Promise((resolve, reject) => {
+                            img.onload = resolve;
+                            img.onerror = reject;
+                            img.src = testUrl;
+                        });
+                        console.log(`Found valid ${type} at:`, testUrl);
+                        items.push({
+                            type,
+                            url: testUrl,
+                            id: fileId
+                        });
+                        break; // If one URL works, no need to try others
+                    } 
+                    // For videos, we need to check differently
+                    else {
+                        const response = await fetch(testUrl, { method: 'HEAD' });
+                        if (response.ok) {
+                            console.log(`Found valid ${type} at:`, testUrl);
+                            items.push({
+                                type,
+                                url: testUrl,
+                                id: fileId
+                            });
+                            break; // If one URL works, no need to try others
+                        }
+                    }
+                } catch (error) {
+                    console.log(`URL failed:`, testUrl, error);
                 }
-            } catch (error) {
-                console.log(`URL failed:`, testUrl, error);
             }
         }
     } catch (error) {
