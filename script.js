@@ -30,14 +30,14 @@ function initializeGallery() {
         // Create media items with webContentLink URLs
         const photos = config.photoIds.map(id => ({
             type: 'image',
-            url: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
+            url: `https://drive.google.com/thumbnail?id=${id}`,
             viewUrl: `https://drive.google.com/file/d/${id}/view?usp=sharing`,
             id: id
         }));
         
         const videos = config.videoIds.map(id => ({
             type: 'video',
-            thumbnailUrl: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
+            thumbnailUrl: `https://drive.google.com/thumbnail?id=${id}`,
             viewUrl: `https://drive.google.com/file/d/${id}/view?usp=sharing`,
             id: id
         }));
@@ -84,9 +84,7 @@ function displayCurrentItem() {
         
         // Add click handler to view full image
         mediaElement.style.cursor = 'pointer';
-        mediaElement.addEventListener('click', () => {
-            window.open(currentItem.viewUrl, '_blank');
-        });
+        mediaElement.onclick = () => window.open(currentItem.viewUrl, '_blank');
         
         // Add error handling
         mediaElement.onerror = function() {
@@ -99,7 +97,7 @@ function displayCurrentItem() {
         mediaElement.className = 'video-container';
         mediaElement.innerHTML = `
             <div class="video-thumbnail">
-                <img src="${currentItem.thumbnailUrl}" alt="Video Thumbnail" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMzAiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDAgNDBMNjAgNTBMNDAgNjBWNjBaIiBmaWxsPSIjMDAwIi8+PC9zdmc+'">
+                <img src="${currentItem.thumbnailUrl}" alt="Video Thumbnail">
                 <div class="play-overlay">
                     <span class="play-icon">▶</span>
                     <p>Click to view video</p>
@@ -108,9 +106,7 @@ function displayCurrentItem() {
         `;
         
         // Add click handler to open video in new tab
-        mediaElement.addEventListener('click', () => {
-            window.open(currentItem.viewUrl, '_blank');
-        });
+        mediaElement.onclick = () => window.open(currentItem.viewUrl, '_blank');
     }
     
     gallerySlider.innerHTML = '';
