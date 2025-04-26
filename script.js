@@ -1,9 +1,16 @@
 // Configuration
 const config = {
-    photosFolderId: '1Qa5FeueDj9dULfL6d_xryLYPpsEDbgoR', // Photos folder ID
-    videosFolderId: '1QbwQj25Xn58iND952gwinBDRihU5peej', // Videos folder ID
+    // Add your photo file IDs here (just the ID part from the Google Drive share link)
+    photoIds: [
+        '1Qa5FeueDj9dULfL6d_xryLYPpsEDbgoR', // Replace with your actual photo file IDs
+        // Add more photo IDs as needed
+    ],
+    // Add your video file IDs here
+    videoIds: [
+        '1QbwQj25Xn58iND952gwinBDRihU5peej', // Replace with your actual video file IDs
+        // Add more video IDs as needed
+    ],
     slideInterval: 5000, // Time between slides in milliseconds
-    totalItems: 100 // Total number of items to display
 };
 
 // Gallery state
@@ -18,9 +25,13 @@ const nextBtn = document.getElementById('nextBtn');
 // Initialize the gallery
 async function initializeGallery() {
     try {
+        console.log('Initializing gallery...');
         // Load both photos and videos
-        const photos = await loadMediaItems(config.photosFolderId, 'image');
-        const videos = await loadMediaItems(config.videosFolderId, 'video');
+        const photos = await loadMediaItems(config.photoIds, 'image');
+        const videos = await loadMediaItems(config.videoIds, 'video');
+        
+        console.log('Loaded photos:', photos.length);
+        console.log('Loaded videos:', videos.length);
         
         // Combine and shuffle the media items
         mediaItems = [...photos, ...videos].sort(() => Math.random() - 0.5);
@@ -42,26 +53,28 @@ async function initializeGallery() {
 }
 
 // Load media items from Google Drive
-async function loadMediaItems(folderId, type) {
+async function loadMediaItems(fileIds, type) {
     const items = [];
     const baseUrl = 'https://drive.google.com/uc?export=view&id=';
     
     try {
-        for (let i = 1; i <= config.totalItems; i++) {
-            const itemId = `${folderId}/${i}`;
-            const testUrl = type === 'image' 
-                ? `${baseUrl}${itemId}`
-                : `${baseUrl}${itemId}`;
+        for (const fileId of fileIds) {
+            const testUrl = `${baseUrl}${fileId}`;
+            console.log(`Testing ${type} URL:`, testUrl);
             
-            // Test if the file exists
-            const response = await fetch(testUrl, { method: 'HEAD' });
-            if (response.ok) {
-                const item = {
-                    type,
-                    url: testUrl,
-                    id: i
-                };
-                items.push(item);
+            try {
+                const response = await fetch(testUrl, { method: 'HEAD' });
+                if (response.ok) {
+                    console.log(`Found valid ${type} at:`, testUrl);
+                    const item = {
+                        type,
+                        url: testUrl,
+                        id: fileId
+                    };
+                    items.push(item);
+                }
+            } catch (error) {
+                console.log(`URL failed:`, testUrl, error);
             }
         }
     } catch (error) {
@@ -76,20 +89,28 @@ function displayCurrentItem() {
     if (mediaItems.length === 0) return;
     
     const currentItem = mediaItems[currentIndex];
+    console.log('Displaying item:', currentItem);
+    
     let mediaElement;
     
     if (currentItem.type === 'image') {
         mediaElement = document.createElement('img');
         mediaElement.src = currentItem.url;
         mediaElement.alt = `Photo ${currentItem.id}`;
-        mediaElement.onerror = () => handleMediaError(currentItem);
+        mediaElement.onerror = () => {
+            console.error('Failed to load image:', currentItem.url);
+            handleMediaError(currentItem);
+        };
     } else {
         mediaElement = document.createElement('video');
         mediaElement.src = currentItem.url;
         mediaElement.controls = true;
         mediaElement.autoplay = true;
         mediaElement.loop = true;
-        mediaElement.onerror = () => handleMediaError(currentItem);
+        mediaElement.onerror = () => {
+            console.error('Failed to load video:', currentItem.url);
+            handleMediaError(currentItem);
+        };
     }
     
     gallerySlider.innerHTML = '';
@@ -105,6 +126,7 @@ function handleMediaError(item) {
 
 // Show error message
 function showError(message) {
+    console.error(message);
     gallerySlider.innerHTML = `<div class="error-message">${message}</div>`;
 }
 
