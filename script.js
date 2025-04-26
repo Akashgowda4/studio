@@ -27,17 +27,16 @@ function initializeGallery() {
     try {
         console.log('Initializing gallery...');
         
-        // Create media items directly without checking URLs
+        // Create media items directly
         const photos = config.photoIds.map(id => ({
             type: 'image',
-            url: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
-            embedUrl: `https://drive.google.com/file/d/${id}/preview`,
+            url: `https://lh3.googleusercontent.com/d/${id}=s1000`, // Direct image URL
             id: id
         }));
         
         const videos = config.videoIds.map(id => ({
             type: 'video',
-            url: `https://drive.google.com/file/d/${id}/preview`,
+            url: `https://drive.google.com/file/d/${id}/preview`, // Preview URL for videos
             id: id
         }));
         
@@ -73,15 +72,15 @@ function displayCurrentItem() {
     let mediaElement;
     
     if (currentItem.type === 'image') {
-        // For images, we'll use an iframe with the preview URL
-        mediaElement = document.createElement('iframe');
-        mediaElement.src = currentItem.embedUrl;
-        mediaElement.frameBorder = '0';
-        mediaElement.allowFullscreen = true;
+        // For images, use a direct img element
+        mediaElement = document.createElement('img');
+        mediaElement.src = currentItem.url;
+        mediaElement.alt = `Photo ${currentItem.id}`;
         mediaElement.style.width = '100%';
         mediaElement.style.height = '100%';
+        mediaElement.style.objectFit = 'cover';
     } else {
-        // For videos, we'll use an iframe with the preview URL
+        // For videos, use an iframe with the preview URL
         mediaElement = document.createElement('iframe');
         mediaElement.src = currentItem.url;
         mediaElement.frameBorder = '0';
