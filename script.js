@@ -22,10 +22,40 @@ const gallerySlider = document.querySelector('.gallery-slider');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 
+// Test URL accessibility
+async function testUrl(url, type) {
+    try {
+        console.log(`Testing ${type} URL:`, url);
+        const response = await fetch(url, { 
+            method: 'HEAD',
+            mode: 'no-cors' // Try with no-cors mode
+        });
+        console.log(`${type} URL status:`, response.status);
+        return true;
+    } catch (error) {
+        console.error(`Error testing ${type} URL:`, error);
+        return false;
+    }
+}
+
 // Initialize the gallery
-function initializeGallery() {
+async function initializeGallery() {
     try {
         console.log('Initializing gallery...');
+        
+        // Test photo URLs
+        for (const id of config.photoIds) {
+            const photoUrl = `https://drive.google.com/uc?export=view&id=${id}`;
+            const isAccessible = await testUrl(photoUrl, 'photo');
+            console.log(`Photo ${id} accessible:`, isAccessible);
+        }
+        
+        // Test video URLs
+        for (const id of config.videoIds) {
+            const videoUrl = `https://drive.google.com/file/d/${id}/preview`;
+            const isAccessible = await testUrl(videoUrl, 'video');
+            console.log(`Video ${id} accessible:`, isAccessible);
+        }
         
         // Create media items with embed URLs
         const photos = config.photoIds.map(id => ({
