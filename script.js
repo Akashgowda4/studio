@@ -22,52 +22,21 @@ const gallerySlider = document.querySelector('.gallery-slider');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 
-// Test URL accessibility
-async function testUrl(url, type) {
-    try {
-        console.log(`Testing ${type} URL:`, url);
-        const response = await fetch(url, { 
-            method: 'HEAD',
-            mode: 'no-cors' // Try with no-cors mode
-        });
-        console.log(`${type} URL status:`, response.status);
-        return true;
-    } catch (error) {
-        console.error(`Error testing ${type} URL:`, error);
-        return false;
-    }
-}
-
 // Initialize the gallery
-async function initializeGallery() {
+function initializeGallery() {
     try {
         console.log('Initializing gallery...');
         
-        // Test photo URLs
-        for (const id of config.photoIds) {
-            const photoUrl = `https://drive.google.com/uc?export=view&id=${id}`;
-            const isAccessible = await testUrl(photoUrl, 'photo');
-            console.log(`Photo ${id} accessible:`, isAccessible);
-        }
-        
-        // Test video URLs
-        for (const id of config.videoIds) {
-            const videoUrl = `https://drive.google.com/file/d/${id}/preview`;
-            const isAccessible = await testUrl(videoUrl, 'video');
-            console.log(`Video ${id} accessible:`, isAccessible);
-        }
-        
-        // Create media items with embed URLs
+        // Create media items with direct URLs
         const photos = config.photoIds.map(id => ({
             type: 'image',
             url: `https://drive.google.com/uc?export=view&id=${id}`,
-            embedUrl: `https://drive.google.com/file/d/${id}/preview`,
             id: id
         }));
         
         const videos = config.videoIds.map(id => ({
             type: 'video',
-            url: `https://drive.google.com/file/d/${id}/preview`,
+            url: `https://drive.google.com/file/d/${id}/view?usp=sharing`,
             id: id
         }));
         
@@ -103,25 +72,25 @@ function displayCurrentItem() {
     let mediaElement;
     
     if (currentItem.type === 'image') {
-        // For images, use an iframe with the preview URL
-        mediaElement = document.createElement('iframe');
-        mediaElement.src = currentItem.embedUrl;
-        mediaElement.frameBorder = '0';
-        mediaElement.allowFullscreen = true;
-        mediaElement.style.width = '100%';
-        mediaElement.style.height = '100%';
-        mediaElement.style.border = 'none';
-        mediaElement.style.background = '#000';
-    } else {
-        // For videos, use an iframe with the preview URL
-        mediaElement = document.createElement('iframe');
+        // For images, use a direct img element
+        mediaElement = document.createElement('img');
         mediaElement.src = currentItem.url;
-        mediaElement.frameBorder = '0';
-        mediaElement.allowFullscreen = true;
+        mediaElement.alt = 'Gallery Image';
         mediaElement.style.width = '100%';
         mediaElement.style.height = '100%';
-        mediaElement.style.border = 'none';
-        mediaElement.style.background = '#000';
+        mediaElement.style.objectFit = 'contain';
+    } else {
+        // For videos, create a link to open in a new tab
+        mediaElement = document.createElement('div');
+        mediaElement.className = 'video-container';
+        mediaElement.innerHTML = `
+            <a href="${currentItem.url}" target="_blank" class="video-link">
+                <div class="video-placeholder">
+                    <span class="play-icon">▶</span>
+                    <p>Click to view video</p>
+                </div>
+            </a>
+        `;
     }
     
     gallerySlider.innerHTML = '';
