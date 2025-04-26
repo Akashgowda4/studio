@@ -1,7 +1,7 @@
 // Configuration
 const config = {
-    photosFolderId: 'YOUR_PHOTOS_FOLDER_ID', // Replace with your Google Drive photos folder ID
-    videosFolderId: 'YOUR_VIDEOS_FOLDER_ID', // Replace with your Google Drive videos folder ID
+    photosFolderId: 'https://drive.google.com/drive/folders/1Qa5FeueDj9dULfL6d_xryLYPpsEDbgoR', // Replace with your Google Drive photos folder ID
+    videosFolderId: 'https://drive.google.com/drive/folders/1QbwQj25Xn58iND952gwinBDRihU5peej', // Replace with your Google Drive videos folder ID
     slideInterval: 5000, // Time between slides in milliseconds
     totalItems: 100 // Total number of items to display
 };
