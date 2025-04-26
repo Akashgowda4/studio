@@ -30,7 +30,7 @@ function initializeGallery() {
         // Create media items with direct URLs
         const photos = config.photoIds.map(id => ({
             type: 'image',
-            url: `https://drive.google.com/uc?export=view&id=${id}`,
+            url: `https://drive.google.com/uc?export=download&id=${id}`,
             id: id
         }));
         
@@ -72,13 +72,19 @@ function displayCurrentItem() {
     let mediaElement;
     
     if (currentItem.type === 'image') {
-        // For images, use a direct img element
+        // For images, use a direct img element with error handling
         mediaElement = document.createElement('img');
         mediaElement.src = currentItem.url;
         mediaElement.alt = 'Gallery Image';
         mediaElement.style.width = '100%';
         mediaElement.style.height = '100%';
         mediaElement.style.objectFit = 'contain';
+        
+        // Add error handling
+        mediaElement.onerror = function() {
+            console.error('Error loading image:', currentItem.url);
+            showError('Error loading image. Please check the file sharing settings.');
+        };
     } else {
         // For videos, create a link to open in a new tab
         mediaElement = document.createElement('div');
