@@ -27,16 +27,18 @@ function initializeGallery() {
     try {
         console.log('Initializing gallery...');
         
-        // Create media items with direct URLs
+        // Create media items with webContentLink URLs
         const photos = config.photoIds.map(id => ({
             type: 'image',
-            url: `https://drive.google.com/uc?export=download&id=${id}`,
+            url: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
+            viewUrl: `https://drive.google.com/file/d/${id}/view?usp=sharing`,
             id: id
         }));
         
         const videos = config.videoIds.map(id => ({
             type: 'video',
-            url: `https://drive.google.com/uc?export=download&id=${id}`,
+            thumbnailUrl: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
+            viewUrl: `https://drive.google.com/file/d/${id}/view?usp=sharing`,
             id: id
         }));
         
@@ -80,6 +82,12 @@ function displayCurrentItem() {
         mediaElement.style.height = '100%';
         mediaElement.style.objectFit = 'contain';
         
+        // Add click handler to view full image
+        mediaElement.style.cursor = 'pointer';
+        mediaElement.addEventListener('click', () => {
+            window.open(currentItem.viewUrl, '_blank');
+        });
+        
         // Add error handling
         mediaElement.onerror = function() {
             console.error('Error loading image:', currentItem.url);
@@ -91,7 +99,7 @@ function displayCurrentItem() {
         mediaElement.className = 'video-container';
         mediaElement.innerHTML = `
             <div class="video-thumbnail">
-                <img src="${currentItem.url}" alt="Video Thumbnail" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMzAiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDAgNDBMNjAgNTBMNDAgNjBWNjBaIiBmaWxsPSIjMDAwIi8+PC9zdmc+'">
+                <img src="${currentItem.thumbnailUrl}" alt="Video Thumbnail" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMzAiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDAgNDBMNjAgNTBMNDAgNjBWNjBaIiBmaWxsPSIjMDAwIi8+PC9zdmc+'">
                 <div class="play-overlay">
                     <span class="play-icon">▶</span>
                     <p>Click to view video</p>
@@ -101,7 +109,7 @@ function displayCurrentItem() {
         
         // Add click handler to open video in new tab
         mediaElement.addEventListener('click', () => {
-            window.open(`https://drive.google.com/file/d/${currentItem.id}/view?usp=sharing`, '_blank');
+            window.open(currentItem.viewUrl, '_blank');
         });
     }
     
