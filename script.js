@@ -25,10 +25,10 @@ function initializeGallery() {
     try {
         console.log('Initializing gallery...');
         
-        // Create media items with webContentLink URLs
+        // Create media items with direct view URLs for images
         const photos = config.photoIds.map(id => ({
             type: 'image',
-            url: `https://drive.google.com/thumbnail?id=${id}`,
+            url: `https://drive.google.com/uc?export=view&id=${id}`,
             viewUrl: `https://drive.google.com/file/d/${id}/view?usp=sharing`,
             id: id
         }));
