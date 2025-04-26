@@ -23,21 +23,32 @@ const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 
 // Initialize the gallery
-async function initializeGallery() {
+function initializeGallery() {
     try {
         console.log('Initializing gallery...');
-        // Load both photos and videos
-        const photos = await loadMediaItems(config.photoIds, 'image');
-        const videos = await loadMediaItems(config.videoIds, 'video');
         
-        console.log('Loaded photos:', photos);
-        console.log('Loaded videos:', videos);
+        // Create media items directly without checking URLs
+        const photos = config.photoIds.map(id => ({
+            type: 'image',
+            url: `https://drive.google.com/thumbnail?id=${id}&sz=w1000`,
+            embedUrl: `https://drive.google.com/file/d/${id}/preview`,
+            id: id
+        }));
+        
+        const videos = config.videoIds.map(id => ({
+            type: 'video',
+            url: `https://drive.google.com/file/d/${id}/preview`,
+            id: id
+        }));
+        
+        console.log('Created photos:', photos);
+        console.log('Created videos:', videos);
         
         // Combine and shuffle the media items
         mediaItems = [...photos, ...videos].sort(() => Math.random() - 0.5);
         
         if (mediaItems.length === 0) {
-            showError('No media items found. Please check your Google Drive configuration.');
+            showError('No media items configured. Please add file IDs to the configuration.');
             return;
         }
         
@@ -48,65 +59,8 @@ async function initializeGallery() {
         startSlideshow();
     } catch (error) {
         console.error('Error initializing gallery:', error);
-        showError('Error loading gallery. Please check your Google Drive configuration.');
+        showError('Error setting up gallery. Please check the configuration.');
     }
-}
-
-// Load media items from Google Drive
-async function loadMediaItems(fileIds, type) {
-    const items = [];
-    const baseUrls = [
-        'https://drive.google.com/uc?export=view&id=',
-        'https://drive.google.com/file/d/',
-        'https://docs.google.com/uc?id='
-    ];
-    
-    try {
-        for (const fileId of fileIds) {
-            for (const baseUrl of baseUrls) {
-                const testUrl = `${baseUrl}${fileId}`;
-                console.log(`Testing ${type} URL:`, testUrl);
-                
-                try {
-                    // For images, we can use a simple fetch
-                    if (type === 'image') {
-                        const img = new Image();
-                        await new Promise((resolve, reject) => {
-                            img.onload = resolve;
-                            img.onerror = reject;
-                            img.src = testUrl;
-                        });
-                        console.log(`Found valid ${type} at:`, testUrl);
-                        items.push({
-                            type,
-                            url: testUrl,
-                            id: fileId
-                        });
-                        break; // If one URL works, no need to try others
-                    } 
-                    // For videos, we need to check differently
-                    else {
-                        const response = await fetch(testUrl, { method: 'HEAD' });
-                        if (response.ok) {
-                            console.log(`Found valid ${type} at:`, testUrl);
-                            items.push({
-                                type,
-                                url: testUrl,
-                                id: fileId
-                            });
-                            break; // If one URL works, no need to try others
-                        }
-                    }
-                } catch (error) {
-                    console.log(`URL failed:`, testUrl, error);
-                }
-            }
-        }
-    } catch (error) {
-        console.error(`Error loading ${type}s:`, error);
-    }
-    
-    return items;
 }
 
 // Display current media item
@@ -119,34 +73,25 @@ function displayCurrentItem() {
     let mediaElement;
     
     if (currentItem.type === 'image') {
-        mediaElement = document.createElement('img');
-        mediaElement.src = currentItem.url;
-        mediaElement.alt = `Photo ${currentItem.id}`;
-        mediaElement.onerror = () => {
-            console.error('Failed to load image:', currentItem.url);
-            handleMediaError(currentItem);
-        };
+        // For images, we'll use an iframe with the preview URL
+        mediaElement = document.createElement('iframe');
+        mediaElement.src = currentItem.embedUrl;
+        mediaElement.frameBorder = '0';
+        mediaElement.allowFullscreen = true;
+        mediaElement.style.width = '100%';
+        mediaElement.style.height = '100%';
     } else {
-        mediaElement = document.createElement('video');
+        // For videos, we'll use an iframe with the preview URL
+        mediaElement = document.createElement('iframe');
         mediaElement.src = currentItem.url;
-        mediaElement.controls = true;
-        mediaElement.autoplay = true;
-        mediaElement.loop = true;
-        mediaElement.onerror = () => {
-            console.error('Failed to load video:', currentItem.url);
-            handleMediaError(currentItem);
-        };
+        mediaElement.frameBorder = '0';
+        mediaElement.allowFullscreen = true;
+        mediaElement.style.width = '100%';
+        mediaElement.style.height = '100%';
     }
     
     gallerySlider.innerHTML = '';
     gallerySlider.appendChild(mediaElement);
-}
-
-// Handle media loading errors
-function handleMediaError(item) {
-    console.error(`Failed to load ${item.type} ${item.id}`);
-    // Try to load the next item
-    nextSlide();
 }
 
 // Show error message
