@@ -36,7 +36,7 @@ function initializeGallery() {
         
         const videos = config.videoIds.map(id => ({
             type: 'video',
-            url: `https://drive.google.com/file/d/${id}/view?usp=sharing`,
+            url: `https://drive.google.com/uc?export=download&id=${id}`,
             id: id
         }));
         
@@ -86,17 +86,23 @@ function displayCurrentItem() {
             showError('Error loading image. Please check the file sharing settings.');
         };
     } else {
-        // For videos, create a link to open in a new tab
+        // For videos, create a clickable thumbnail
         mediaElement = document.createElement('div');
         mediaElement.className = 'video-container';
         mediaElement.innerHTML = `
-            <a href="${currentItem.url}" target="_blank" class="video-link">
-                <div class="video-placeholder">
+            <div class="video-thumbnail">
+                <img src="${currentItem.url}" alt="Video Thumbnail" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB2aWV3Qm94PSIwIDAgMTAwIDEwMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMDAwIi8+PGNpcmNsZSBjeD0iNTAiIGN5PSI1MCIgcj0iMzAiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNNDAgNDBMNjAgNTBMNDAgNjBWNjBaIiBmaWxsPSIjMDAwIi8+PC9zdmc+'">
+                <div class="play-overlay">
                     <span class="play-icon">▶</span>
                     <p>Click to view video</p>
                 </div>
-            </a>
+            </div>
         `;
+        
+        // Add click handler to open video in new tab
+        mediaElement.addEventListener('click', () => {
+            window.open(`https://drive.google.com/file/d/${currentItem.id}/view?usp=sharing`, '_blank');
+        });
     }
     
     gallerySlider.innerHTML = '';
